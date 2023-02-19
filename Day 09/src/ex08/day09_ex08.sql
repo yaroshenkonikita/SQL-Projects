@@ -9,8 +9,6 @@ $FIBONACCI$
 DECLARE
     N1 NUMERIC = 0;
     N2 NUMERIC = 1;
-    I NUMERIC = 3;
-    TEMP NUMERIC;
 BEGIN
     IF PSTOP > 0
     THEN
@@ -23,12 +21,10 @@ BEGIN
             RETURN NEXT;
 
             LOOP
-                EXIT WHEN I > PSTOP;
-                NUMBER := (N2 + N1);
-                TEMP := N2;
+                NUMBER := (NUMBER + N1);
+                N1 := N2;
                 N2 := NUMBER;
-                N1 := TEMP;
-                I := (I + 1);
+                EXIT WHEN NUMBER >= PSTOP;
                 RETURN NEXT;
             END LOOP;
         END IF;
