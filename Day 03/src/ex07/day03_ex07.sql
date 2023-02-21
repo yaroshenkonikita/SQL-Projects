@@ -1,2 +1,0 @@
-INSERT INTO MENU VALUES (19, 2, 'greek pizza', 800);
--- DELETE FROM MENU WHERE ID = 19;
