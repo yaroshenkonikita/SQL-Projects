@@ -1,154 +1,155 @@
 DROP TABLE IF EXISTS P2P;
-DROP TABLE IF EXISTS Recommendations;
+DROP TABLE IF EXISTS RECOMMENDATIONS;
 DROP TABLE IF EXISTS XP;
-DROP TABLE IF EXISTS TimeTracking;
-DROP TABLE IF EXISTS Recommendations;
-DROP TABLE IF EXISTS Friends;
-DROP TABLE IF EXISTS TransferredPoints;
-DROP TABLE IF EXISTS Verter;
-DROP TABLE IF EXISTS Checks;
-DROP TABLE IF EXISTS Tasks;
-DROP TABLE IF EXISTS Peers;
-DROP TYPE IF EXISTS CheckStatus;
-create table Peers
+DROP TABLE IF EXISTS TIMETRACKING;
+DROP TABLE IF EXISTS FRIENDS;
+DROP TABLE IF EXISTS TRANSFERREDPOINTS;
+DROP TABLE IF EXISTS VERTER;
+DROP TABLE IF EXISTS CHECKS;
+DROP TABLE IF EXISTS TASKS;
+DROP TABLE IF EXISTS PEERS;
+DROP TYPE IF EXISTS CHECKSTATUS;
+CREATE TABLE PEERS
 (
-    Nickname varchar not null primary key,
-    Birthday date    not null
+    NICKNAME VARCHAR NOT NULL PRIMARY KEY,
+    BIRTHDAY DATE    NOT NULL
 );
-create table Tasks
+CREATE TABLE TASKS
 (
-    Title      varchar not null primary key,
-    ParentTask varchar default null,
-    MaxXP      integer not null
+    TITLE      VARCHAR NOT NULL PRIMARY KEY,
+    PARENTTASK VARCHAR DEFAULT NULL,
+    MAXXP      INTEGER NOT NULL
 );
-create table Checks
+CREATE TABLE CHECKS
 (
-    id   bigint primary key,
-    peer varchar not null,
-    task varchar not null,
-    Date date    not null,
-    constraint fk_checks_peers_id foreign key (peer) references Peers (Nickname),
-    constraint fk_checks_tasks_id foreign key (task) references Tasks (Title)
+    ID   BIGINT PRIMARY KEY,
+    PEER VARCHAR NOT NULL,
+    TASK VARCHAR NOT NULL,
+    DATE DATE    NOT NULL,
+    CONSTRAINT FK_CHECKS_PEERS_ID FOREIGN KEY (PEER) REFERENCES PEERS (NICKNAME),
+    CONSTRAINT FK_CHECKS_TASKS_ID FOREIGN KEY (TASK) REFERENCES TASKS (TITLE)
 );
-CREATE TYPE CheckStatus AS ENUM ('Start', 'Success', 'Failure');
-create table P2P
+CREATE TYPE CHECKSTATUS AS ENUM ('Start', 'Success', 'Failure');
+CREATE TABLE P2P
 (
-    id           bigint primary key,
-    Check_id     bigint      not null,
-    CheckingPeer varchar     not null,
-    State        CheckStatus not null,
-    Time         time        not null,
-    constraint fk_p2p_chesks_id foreign key (Check_id) references Checks (id),
-    constraint fk_p2p_peers_id foreign key (CheckingPeer) references Peers (Nickname)
+    ID           BIGINT PRIMARY KEY,
+    CHECK_ID     BIGINT      NOT NULL,
+    CHECKINGPEER VARCHAR     NOT NULL,
+    STATE        CHECKSTATUS NOT NULL,
+    TIME         TIME        NOT NULL,
+    CONSTRAINT FK_P2P_CHESKS_ID FOREIGN KEY (CHECK_ID) REFERENCES CHECKS (ID),
+    CONSTRAINT FK_P2P_PEERS_ID FOREIGN KEY (CHECKINGPEER) REFERENCES PEERS (NICKNAME)
 );
-create table Verter
+CREATE TABLE VERTER
 (
-    id       bigint primary key,
-    Check_id bigint      not null,
-    State    CheckStatus not null,
-    Time     time        not null,
-    constraint fk_verter_check_id foreign key (Check_id) references Checks (id)
+    ID       BIGINT PRIMARY KEY,
+    CHECK_ID BIGINT      NOT NULL,
+    STATE    CHECKSTATUS NOT NULL,
+    TIME     TIME        NOT NULL,
+    CONSTRAINT FK_VERTER_CHECK_ID FOREIGN KEY (CHECK_ID) REFERENCES CHECKS (ID)
 );
-create table TransferredPoints
+CREATE TABLE TRANSFERREDPOINTS
 (
-    id           bigint primary key,
-    CheckingPeer varchar not null,
-    CheckedPeer  varchar not null,
-    PointsAmount integer not null,
-    constraint fk_transferredpoints_checkingpeer_peers_id foreign key (CheckingPeer) references Peers (Nickname),
-    constraint fk_transferredpoints_checkedpeer_peers_id foreign key (CheckedPeer) references Peers (Nickname)
+    ID           BIGINT PRIMARY KEY,
+    CHECKINGPEER VARCHAR NOT NULL,
+    CHECKEDPEER  VARCHAR NOT NULL,
+    POINTSAMOUNT INTEGER DEFAULT 0,
+    CONSTRAINT FK_TRANSFERREDPOINTS_CHECKINGPEER_PEERS_ID FOREIGN KEY (CHECKINGPEER) REFERENCES PEERS (NICKNAME),
+    CONSTRAINT FK_TRANSFERREDPOINTS_CHECKEDPEER_PEERS_ID FOREIGN KEY (CHECKEDPEER) REFERENCES PEERS (NICKNAME)
 );
-create table Friends
+CREATE TABLE FRIENDS
 (
-    id    bigint primary key,
-    Peer1 varchar not null,
-    Peer2 varchar not null,
-    constraint fk_friends_peer1_peers_id foreign key (Peer1) references Peers (Nickname),
-    constraint fk_friends_peer2_peers_id foreign key (Peer2) references Peers (Nickname)
+    ID    BIGINT PRIMARY KEY,
+    PEER1 VARCHAR NOT NULL,
+    PEER2 VARCHAR NOT NULL,
+    CONSTRAINT FK_FRIENDS_PEER1_PEERS_ID FOREIGN KEY (PEER1) REFERENCES PEERS (NICKNAME),
+    CONSTRAINT FK_FRIENDS_PEER2_PEERS_ID FOREIGN KEY (PEER2) REFERENCES PEERS (NICKNAME)
 );
-create table Recommendations
+CREATE TABLE RECOMMENDATIONS
 (
-    id             bigint primary key,
-    Peer           varchar not null,
-    RecomendedPeer varchar not null,
-    constraint fk_friends_peer_peers_id foreign key (Peer) references Peers (Nickname),
-    constraint fk_friends_recomendedpeer_peers_id foreign key (RecomendedPeer) references Peers (Nickname)
+    ID             BIGINT PRIMARY KEY,
+    PEER           VARCHAR NOT NULL,
+    RECOMENDEDPEER VARCHAR NOT NULL,
+    CONSTRAINT FK_FRIENDS_PEER_PEERS_ID FOREIGN KEY (PEER) REFERENCES PEERS (NICKNAME),
+    CONSTRAINT FK_FRIENDS_RECOMENDEDPEER_PEERS_ID FOREIGN KEY (RECOMENDEDPEER) REFERENCES PEERS (NICKNAME)
 );
-create table XP
+CREATE TABLE XP
 (
-    id       bigint primary key,
-    Check_id bigint not null,
-    XPAmount integer,
-    constraint fk_xp_check_id foreign key (Check_id) references Checks (id)
+    ID       BIGINT PRIMARY KEY,
+    CHECK_ID BIGINT NOT NULL,
+    XPAMOUNT INTEGER,
+    CONSTRAINT FK_XP_CHECK_ID FOREIGN KEY (CHECK_ID) REFERENCES CHECKS (ID)
 );
-create table TimeTracking
+CREATE TABLE TIMETRACKING
 (
-    id    bigint primary key,
-    Peer  varchar   not null,
-    Date  date      not null,
-    Time  time not null,
-    State integer   not null,
-    constraint fk_timetracking_peers_id foreign key (Peer) references Peers (Nickname)
+    ID    BIGINT PRIMARY KEY,
+    PEER  VARCHAR   NOT NULL,
+    DATE  DATE      NOT NULL,
+    TIME  TIME NOT NULL,
+    STATE INTEGER   NOT NULL,
+    CONSTRAINT FK_TIMETRACKING_PEERS_ID FOREIGN KEY (PEER) REFERENCES PEERS (NICKNAME)
 );
 
-CREATE OR REPLACE PROCEDURE export_to_csv(del CHARACTER, path TEXT)
-    LANGUAGE plpgsql
+CREATE OR REPLACE PROCEDURE EXPORT_TO_CSV(DEL CHARACTER, PATH TEXT)
+    LANGUAGE PLPGSQL
 AS
 $$
 DECLARE
-    statement TEXT;
-    tables    RECORD;
+    STATEMENT TEXT;
+    TABLES    RECORD;
 BEGIN
-    FOR tables IN
-        SELECT table_name
-        FROM information_schema.tables
-        WHERE table_type = 'BASE TABLE'
-          AND table_name NOT LIKE ('pg_%')
-          AND table_name NOT LIKE ('sql_%')
+    FOR TABLES IN
+        SELECT TABLE_NAME
+        FROM INFORMATION_SCHEMA.TABLES
+        WHERE TABLE_TYPE = 'BASE TABLE'
+          AND TABLE_NAME NOT LIKE ('pg_%')
+          AND TABLE_NAME NOT LIKE ('sql_%')
         LOOP
-            statement := 'COPY ' || tables.table_name || ' TO ''' ||
-                         path || '/' || tables.table_name || '.csv' ||
-                         ''' WITH DELIMITER ''' || del || '''CSV;';
-            EXECUTE statement;
+            STATEMENT := 'COPY ' || TABLES.TABLE_NAME || ' TO ''' ||
+                         PATH || '/' || TABLES.TABLE_NAME || '.csv' ||
+                         ''' WITH DELIMITER ''' || DEL || '''CSV;';
+            EXECUTE STATEMENT;
         END LOOP;
 END;
 $$;
 
-CREATE OR REPLACE PROCEDURE import_from_csv(del CHARACTER, path TEXT)
-    LANGUAGE plpgsql
+CREATE OR REPLACE PROCEDURE IMPORT_FROM_CSV(DEL CHARACTER, PATH TEXT)
+    LANGUAGE PLPGSQL
 AS
 $$
 DECLARE
-    statement TEXT;
-    tables    RECORD;
+    STATEMENT TEXT;
+    TABLES    RECORD;
 BEGIN
-    statement := 'COPY peers FROM ''' ||
-                 path || '/peers.csv' ||
-                 ''' WITH DELIMITER ''' || del || '''CSV;';
-    EXECUTE statement;
-    statement := 'COPY tasks FROM ''' ||
-                 path || '/tasks.csv' ||
-                 ''' WITH DELIMITER ''' || del || '''CSV;';
-    EXECUTE statement;
-    statement := 'COPY checks FROM ''' ||
-                 path || '/checks.csv' ||
-                 ''' WITH DELIMITER ''' || del || '''CSV;';
-    EXECUTE statement;
-    FOR tables IN
-        SELECT table_name
-        FROM information_schema.tables
-        WHERE table_type = 'BASE TABLE'
-          AND table_name NOT LIKE ('pg_%')
-          AND table_name NOT LIKE ('sql_%')
-          AND table_name NOT LIKE ('peers')
-          AND table_name NOT LIKE ('checks')
-          AND table_name NOT LIKE ('tasks')
+    STATEMENT := 'COPY peers FROM ''' ||
+                 PATH || '/peers.csv' ||
+                 ''' WITH DELIMITER ''' || DEL || '''CSV;';
+    EXECUTE STATEMENT;
+    STATEMENT := 'COPY tasks FROM ''' ||
+                 PATH || '/tasks.csv' ||
+                 ''' WITH DELIMITER ''' || DEL || '''CSV;';
+    EXECUTE STATEMENT;
+    STATEMENT := 'COPY checks FROM ''' ||
+                 PATH || '/checks.csv' ||
+                 ''' WITH DELIMITER ''' || DEL || '''CSV;';
+    EXECUTE STATEMENT;
+    FOR TABLES IN
+        SELECT TABLE_NAME
+        FROM INFORMATION_SCHEMA.TABLES
+        WHERE TABLE_TYPE = 'BASE TABLE'
+          AND TABLE_NAME NOT LIKE ('pg_%')
+          AND TABLE_NAME NOT LIKE ('sql_%')
+          AND TABLE_NAME NOT LIKE ('peers')
+          AND TABLE_NAME NOT LIKE ('checks')
+          AND TABLE_NAME NOT LIKE ('tasks')
 
         LOOP
-            statement := 'COPY ' || tables.table_name || ' FROM ''' ||
-                         path || '/' || tables.table_name || '.csv' ||
-                         ''' WITH DELIMITER ''' || del || '''CSV;';
-            EXECUTE statement;
+            STATEMENT := 'COPY ' || TABLES.TABLE_NAME || ' FROM ''' ||
+                         PATH || '/' || TABLES.TABLE_NAME || '.csv' ||
+                         ''' WITH DELIMITER ''' || DEL || '''CSV;';
+            EXECUTE STATEMENT;
         END LOOP;
 END;
 $$;
+
+CALL IMPORT_FROM_CSV(';', 'B:\CSV');

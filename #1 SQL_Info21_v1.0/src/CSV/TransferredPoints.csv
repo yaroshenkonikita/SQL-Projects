@@ -1,0 +1,15 @@
+1;kegsbett;inigosto;1
+2;inigosto;suppfill;1
+3;suppfill;kegsbett;1
+4;rollback;inigosto;1
+5;suppfill;rollback;1
+6;kegsbett;rollback;1
+7;inigosto;rollback;1
+8;suppfill;inigosto;1
+9;kegsbett;rollback;1
+10;inigosto;suppfill;1
+11;kegsbett;suppfill;1
+12;kegsbett;suppfill;1
+13;kegsbett;suppfill;1
+14;kegsbett;suppfill;1
+15;kegsbett;suppfill;1
